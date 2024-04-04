@@ -4,7 +4,7 @@ using System.Threading;
 
 namespace LegacyApp
 {
-    public class ClientRepository
+    internal class ClientRepository
     {
         /// <summary>
         /// This collection is used to simulate remote database
