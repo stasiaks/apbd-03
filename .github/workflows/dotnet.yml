@@ -10,7 +10,7 @@ jobs:
   check_formatting:
 
     runs-on: ubuntu-latest
-    name: Check Formatting
+    name: Check Formatting & Test
 
     steps:
     - uses: actions/checkout@v3
@@ -22,4 +22,5 @@ jobs:
       run: dotnet tool restore
     - name: Run CSharpier
       run: dotnet csharpier --check ./src
-
+    - name: Test
+      run: dotnet test ./src
