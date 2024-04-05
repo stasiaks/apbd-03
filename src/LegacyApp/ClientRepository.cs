@@ -18,7 +18,7 @@ namespace LegacyApp
         {
             {
                 1,
-                new Client(1, "Kowalski", "Warszawa, Złota 12", "kowalski@wp.pl", "NormalClient")
+                new Client(1, "Kowalski", "Warszawa, Złota 12", "kowalski@wp.pl", ClientType.Regular)
             },
             {
                 2,
@@ -27,16 +27,16 @@ namespace LegacyApp
                     "Malewski",
                     "Warszawa, Koszykowa 86",
                     "malewski@gmail.pl",
-                    "VeryImportantClient"
+                    ClientType.VeryImportant
                 )
             },
             {
                 3,
-                new Client(3, "Smith", "Warszawa, Kolorowa 22", "smith@gmail.pl", "ImportantClient")
+                new Client(3, "Smith", "Warszawa, Kolorowa 22", "smith@gmail.pl", ClientType.Important)
             },
             {
                 4,
-                new Client(4, "Doe", "Warszawa, Koszykowa 32", "doe@gmail.pl", "ImportantClient")
+                new Client(4, "Doe", "Warszawa, Koszykowa 32", "doe@gmail.pl", ClientType.Important)
             },
             {
                 5,
@@ -45,7 +45,7 @@ namespace LegacyApp
                     "Kwiatkowski",
                     "Warszawa, Złota 52",
                     "kwiatkowski@wp.pl",
-                    "NormalClient"
+                    ClientType.Regular
                 )
             },
             {
@@ -55,7 +55,7 @@ namespace LegacyApp
                     "Andrzejewicz",
                     "Warszawa, Koszykowa 52",
                     "andrzejewicz@wp.pl",
-                    "NormalClient"
+                    ClientType.Regular
                 )
             }
         };

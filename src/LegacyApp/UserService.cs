@@ -11,7 +11,7 @@ namespace LegacyApp
     ) : IDisposable // Only for purpose of handling legacy service instantiation
     {
         private readonly IUserCreditService userCreditService = userCreditService;
-        private readonly List<IDisposable> _compositeDisposables = [];
+        private readonly List<IDisposable> _compositeDisposables = []; // Przyzwyczajenie do klasy System.Reactive.Disposables.CompositeDisposable daje się we znaki...
 
         [Obsolete("Legacy left for compatibility")]
         public UserService()
@@ -80,11 +80,11 @@ namespace LegacyApp
 
             var user = new User(client, dateOfBirth, email, firstName, lastName, false, null);
 
-            if (client.Type == "VeryImportantClient")
+            if (client.Type == ClientType.VeryImportant)
             {
                 user = user with { IsExemptFromCreditLimitMinimum = true };
             }
-            else if (client.Type == "ImportantClient")
+            else if (client.Type == ClientType.Important)
             {
                 int creditLimit = userCreditService.GetCreditLimit(
                     user.LastName,
