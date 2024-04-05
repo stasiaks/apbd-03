@@ -13,69 +13,45 @@ namespace LegacyApp
         {
             {
                 1,
-                new Client
-                {
-                    ClientId = 1,
-                    Name = "Kowalski",
-                    Address = "Warszawa, Złota 12",
-                    Email = "kowalski@wp.pl",
-                    Type = "NormalClient"
-                }
+                new Client(1, "Kowalski", "Warszawa, Złota 12", "kowalski@wp.pl", "NormalClient")
             },
             {
                 2,
-                new Client
-                {
-                    ClientId = 2,
-                    Name = "Malewski",
-                    Address = "Warszawa, Koszykowa 86",
-                    Email = "malewski@gmail.pl",
-                    Type = "VeryImportantClient"
-                }
+                new Client(
+                    2,
+                    "Malewski",
+                    "Warszawa, Koszykowa 86",
+                    "malewski@gmail.pl",
+                    "VeryImportantClient"
+                )
             },
             {
                 3,
-                new Client
-                {
-                    ClientId = 3,
-                    Name = "Smith",
-                    Address = "Warszawa, Kolorowa 22",
-                    Email = "smith@gmail.pl",
-                    Type = "ImportantClient"
-                }
+                new Client(3, "Smith", "Warszawa, Kolorowa 22", "smith@gmail.pl", "ImportantClient")
             },
             {
                 4,
-                new Client
-                {
-                    ClientId = 4,
-                    Name = "Doe",
-                    Address = "Warszawa, Koszykowa 32",
-                    Email = "doe@gmail.pl",
-                    Type = "ImportantClient"
-                }
+                new Client(4, "Doe", "Warszawa, Koszykowa 32", "doe@gmail.pl", "ImportantClient")
             },
             {
                 5,
-                new Client
-                {
-                    ClientId = 5,
-                    Name = "Kwiatkowski",
-                    Address = "Warszawa, Złota 52",
-                    Email = "kwiatkowski@wp.pl",
-                    Type = "NormalClient"
-                }
+                new Client(
+                    5,
+                    "Kwiatkowski",
+                    "Warszawa, Złota 52",
+                    "kwiatkowski@wp.pl",
+                    "NormalClient"
+                )
             },
             {
                 6,
-                new Client
-                {
-                    ClientId = 6,
-                    Name = "Andrzejewicz",
-                    Address = "Warszawa, Koszykowa 52",
-                    Email = "andrzejewicz@wp.pl",
-                    Type = "NormalClient"
-                }
+                new Client(
+                    6,
+                    "Andrzejewicz",
+                    "Warszawa, Koszykowa 52",
+                    "andrzejewicz@wp.pl",
+                    "NormalClient"
+                )
             }
         };
 

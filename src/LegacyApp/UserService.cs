@@ -4,6 +4,7 @@ namespace LegacyApp
 {
     public sealed class UserService
     {
+        [Obsolete("Legacy left for compatibility")]
         public bool AddUser(
             string firstName,
             string lastName,
@@ -38,18 +39,19 @@ namespace LegacyApp
             var clientRepository = new ClientRepository();
             var client = clientRepository.GetById(clientId);
 
-            var user = new User
-            {
-                Client = client,
-                DateOfBirth = dateOfBirth,
-                EmailAddress = email,
-                FirstName = firstName,
-                LastName = lastName
-            };
+            var user = new User(
+                client,
+                DateOnly.FromDateTime(dateOfBirth),
+                email,
+                firstName,
+                lastName,
+                true,
+                null
+            );
 
             if (client.Type == "VeryImportantClient")
             {
-                user.HasCreditLimit = false;
+                user = user with { HasCreditLimit = false };
             }
             else if (client.Type == "ImportantClient")
             {
@@ -57,22 +59,21 @@ namespace LegacyApp
                 {
                     int creditLimit = userCreditService.GetCreditLimit(
                         user.LastName,
-                        user.DateOfBirth
+                        user.DateOfBirth.ToDateTime(default)
                     );
                     creditLimit = creditLimit * 2;
-                    user.CreditLimit = creditLimit;
+                    user = user with { HasCreditLimit = false, CreditLimit = creditLimit };
                 }
             }
             else
             {
-                user.HasCreditLimit = true;
                 using (var userCreditService = new UserCreditService())
                 {
                     int creditLimit = userCreditService.GetCreditLimit(
                         user.LastName,
-                        user.DateOfBirth
+                        user.DateOfBirth.ToDateTime(default)
                     );
-                    user.CreditLimit = creditLimit;
+                    user = user with { HasCreditLimit = false, CreditLimit = creditLimit };
                 }
             }
 
