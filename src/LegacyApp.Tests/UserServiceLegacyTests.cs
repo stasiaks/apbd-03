@@ -1,6 +1,7 @@
 namespace LegacyApp.Tests;
 
-public class UserServiceTests
+#pragma warning disable CS0618 // These are tests for legacy invocations
+public class UserServiceLegacyTests
 {
     [Fact]
     public void GivenLegacyAppConsumerData_ReturnsTrue()
@@ -124,3 +125,4 @@ public class UserServiceTests
 
     private static UserService CreateSut() => new();
 }
+#pragma warning restore CS0618

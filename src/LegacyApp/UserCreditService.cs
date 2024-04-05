@@ -4,7 +4,12 @@ using System.Threading;
 
 namespace LegacyApp
 {
-    internal sealed class UserCreditService : IDisposable
+    public interface IUserCreditService
+    {
+        int GetCreditLimit(string lastName, DateTime dateOfBirth);
+    }
+
+    internal sealed class UserCreditService : IUserCreditService, IDisposable
     {
         /// <summary>
         /// Simulating database
@@ -27,7 +32,7 @@ namespace LegacyApp
         /// This method is simulating contact with remote service which is used to get info about someone's credit limit
         /// </summary>
         /// <returns>Client's credit limit</returns>
-        internal int GetCreditLimit(string lastName, DateTime dateOfBirth)
+        public int GetCreditLimit(string lastName, DateTime dateOfBirth)
         {
             int randomWaitingTime = new Random().Next(3000);
             Thread.Sleep(randomWaitingTime);
