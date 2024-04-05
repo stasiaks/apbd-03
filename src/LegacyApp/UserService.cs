@@ -1,15 +1,22 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace LegacyApp
 {
     public sealed class UserService(
         IUserCreditService userCreditService,
         IClientRepository clientRepository
-    )
+    ) : IDisposable // Only for purpose of handling legacy service instantiation
     {
+        private readonly IUserCreditService userCreditService = userCreditService;
+        private readonly List<IDisposable> _compositeDisposables = [];
+
         [Obsolete("Legacy left for compatibility")]
         public UserService()
-            : this(new UserCreditService(), new ClientRepository()) { }
+            : this(new UserCreditService(), new ClientRepository())
+        {
+            _compositeDisposables.Add((UserCreditService)userCreditService);
+        }
 
         [Obsolete("Legacy left for compatibility")]
         public bool AddUser(
@@ -85,5 +92,7 @@ namespace LegacyApp
             UserDataAccess.AddUser(user);
             return true;
         }
+
+        public void Dispose() => _compositeDisposables.ForEach(disposable => disposable.Dispose());
     }
 }
