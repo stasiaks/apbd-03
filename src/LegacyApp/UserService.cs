@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace LegacyApp
 {
-    public sealed class UserService(
+    public sealed partial class UserService(
         IUserCreditService userCreditService,
         IClientRepository clientRepository
     ) : IDisposable // Only for purpose of handling legacy service instantiation
@@ -18,6 +19,9 @@ namespace LegacyApp
             _compositeDisposables.Add((UserCreditService)userCreditService);
         }
 
+        [GeneratedRegex("(?<local>.+)@(?<subdomain>.+)\\.(?<tld>.+)")]
+        private static partial Regex EmailRegex();
+
         [Obsolete("Legacy left for compatibility")]
         public bool AddUser(
             string firstName,
@@ -27,12 +31,33 @@ namespace LegacyApp
             int clientId
         )
         {
-            if (string.IsNullOrEmpty(firstName) || string.IsNullOrEmpty(lastName))
+            var emailMatch = EmailRegex().Match(email);
+            if (!emailMatch.Success)
             {
                 return false;
             }
+            var emailRecord = new Email(
+                emailMatch.Groups["local"].Value,
+                new Domain(emailMatch.Groups["subdomain"].Value, emailMatch.Groups["tld"].Value)
+            );
+            return AddUser(
+                firstName,
+                lastName,
+                emailRecord,
+                DateOnly.FromDateTime(dateOfBirth),
+                clientId
+            );
+        }
 
-            if (!email.Contains('@') && !email.Contains('.'))
+        public bool AddUser(
+            string firstName,
+            string lastName,
+            Email email,
+            DateOnly dateOfBirth,
+            int clientId
+        )
+        {
+            if (string.IsNullOrEmpty(firstName) || string.IsNullOrEmpty(lastName))
             {
                 return false;
             }
@@ -52,19 +77,11 @@ namespace LegacyApp
 
             var client = clientRepository.GetById(clientId);
 
-            var user = new User(
-                client,
-                DateOnly.FromDateTime(dateOfBirth),
-                email,
-                firstName,
-                lastName,
-                true,
-                null
-            );
+            var user = new User(client, dateOfBirth, email, firstName, lastName, false, null);
 
             if (client.Type == "VeryImportantClient")
             {
-                user = user with { HasCreditLimit = false };
+                user = user with { IsExemptFromCreditLimitMinimum = true };
             }
             else if (client.Type == "ImportantClient")
             {
@@ -73,7 +90,11 @@ namespace LegacyApp
                     user.DateOfBirth.ToDateTime(default)
                 );
                 creditLimit *= 2;
-                user = user with { HasCreditLimit = false, CreditLimit = creditLimit };
+                user = user with
+                {
+                    IsExemptFromCreditLimitMinimum = true,
+                    CreditLimit = creditLimit
+                };
             }
             else
             {
@@ -81,10 +102,14 @@ namespace LegacyApp
                     user.LastName,
                     user.DateOfBirth.ToDateTime(default)
                 );
-                user = user with { HasCreditLimit = false, CreditLimit = creditLimit };
+                user = user with
+                {
+                    IsExemptFromCreditLimitMinimum = false,
+                    CreditLimit = creditLimit
+                };
             }
 
-            if (user.HasCreditLimit && user.CreditLimit < 500)
+            if (!user.IsExemptFromCreditLimitMinimum && user.CreditLimit < 500)
             {
                 return false;
             }
