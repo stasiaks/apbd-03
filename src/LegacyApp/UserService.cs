@@ -6,7 +6,8 @@ namespace LegacyApp
 {
     public sealed partial class UserService(
         IUserCreditService userCreditService,
-        IClientRepository clientRepository
+        IClientRepository clientRepository,
+        IUserDataAccess userDataAccess
     ) : IDisposable // Only for purpose of handling legacy service instantiation
     {
         private readonly IUserCreditService userCreditService = userCreditService;
@@ -14,7 +15,7 @@ namespace LegacyApp
 
         [Obsolete("Legacy left for compatibility")]
         public UserService()
-            : this(new UserCreditService(), new ClientRepository())
+            : this(new UserCreditService(), new ClientRepository(), new UserDataAccessWrapper())
         {
             _compositeDisposables.Add((UserCreditService)userCreditService);
         }
@@ -114,7 +115,7 @@ namespace LegacyApp
                 return false;
             }
 
-            UserDataAccess.AddUser(user);
+            userDataAccess.AddUser(user);
             return true;
         }
 
