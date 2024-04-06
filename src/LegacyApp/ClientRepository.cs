@@ -7,7 +7,7 @@ namespace LegacyApp
 {
     public interface IClientRepository
     {
-        Client? GetById(int clientId);
+        Client GetById(int clientId);
     }
 
     internal class ClientRepository : IClientRepository
@@ -43,12 +43,18 @@ namespace LegacyApp
         /// Simulating fetching a client from remote database
         /// </summary>
         /// <returns>Returning client object or <c>null</c> if client doesn't exist</returns>
-        public Client? GetById(int clientId)
+        public Client GetById(int clientId)
         {
             int randomWaitTime = new Random().Next(2000);
             Thread.Sleep(randomWaitTime);
 
-            return Database.GetValueOrDefault(clientId);
+            var result = Database.GetValueOrDefault(clientId);
+
+            return result
+                ?? throw new ArgumentException(
+                    "There is no client with given id",
+                    nameof(clientId)
+                );
         }
     }
 }
