@@ -4,10 +4,12 @@ using System.Text.RegularExpressions;
 
 namespace LegacyApp
 {
+    // Zakładam że po prawdziwym refactorze ustawiłbym kontener IoC i wystawił interfejs pod rejestracje do niego, więc implementacje są internal
     public sealed partial class UserService(
         IUserCreditService userCreditService,
         IClientRepository clientRepository,
-        IUserDataAccess userDataAccess
+        IUserDataAccess userDataAccess,
+        IDateTimeProvider dateTimeProvider
     ) : IDisposable // Only for purpose of handling legacy service instantiation
     {
         private readonly IUserCreditService userCreditService = userCreditService;
@@ -15,7 +17,12 @@ namespace LegacyApp
 
         [Obsolete("Legacy left for compatibility")]
         public UserService()
-            : this(new UserCreditService(), new ClientRepository(), new UserDataAccessWrapper())
+            : this(
+                new UserCreditService(),
+                new ClientRepository(),
+                new UserDataAccessWrapper(),
+                new DateTimeProvider()
+            )
         {
             _compositeDisposables.Add((UserCreditService)userCreditService);
         }
@@ -47,10 +54,11 @@ namespace LegacyApp
                 emailRecord,
                 DateOnly.FromDateTime(dateOfBirth),
                 clientId
-            );
+            )
+                is not null;
         }
 
-        public bool AddUser(
+        public User? AddUser(
             string firstName,
             string lastName,
             Email email,
@@ -60,10 +68,10 @@ namespace LegacyApp
         {
             if (string.IsNullOrEmpty(firstName) || string.IsNullOrEmpty(lastName))
             {
-                return false;
+                return null;
             }
 
-            var now = DateTime.Now;
+            var now = dateTimeProvider.Now;
             int age = now.Year - dateOfBirth.Year;
             if (
                 now.Month < dateOfBirth.Month
@@ -73,17 +81,19 @@ namespace LegacyApp
 
             if (age < 21)
             {
-                return false;
+                return null;
             }
 
             var client = clientRepository.GetById(clientId);
 
-            var user = new User(client, dateOfBirth, email, firstName, lastName, false, null);
-
-            if (client.Type == ClientType.VeryImportant)
+            if (client is null)
             {
-                user = user with { IsExemptFromCreditLimitMinimum = true };
+                throw new ArgumentException("There is no client with given id", nameof(clientId));
             }
+
+            var user = new User(client, dateOfBirth, email, firstName, lastName, null);
+
+            if (client.Type == ClientType.VeryImportant) { }
             else if (client.Type == ClientType.Important)
             {
                 int creditLimit = userCreditService.GetCreditLimit(
@@ -91,11 +101,7 @@ namespace LegacyApp
                     user.DateOfBirth.ToDateTime(default)
                 );
                 creditLimit *= 2;
-                user = user with
-                {
-                    IsExemptFromCreditLimitMinimum = true,
-                    CreditLimit = creditLimit
-                };
+                user = user with { CreditLimit = new(false, creditLimit) };
             }
             else
             {
@@ -103,20 +109,16 @@ namespace LegacyApp
                     user.LastName,
                     user.DateOfBirth.ToDateTime(default)
                 );
-                user = user with
-                {
-                    IsExemptFromCreditLimitMinimum = false,
-                    CreditLimit = creditLimit
-                };
+                user = user with { CreditLimit = new(true, creditLimit) };
             }
 
-            if (!user.IsExemptFromCreditLimitMinimum && user.CreditLimit < 500)
+            if (user.CreditLimit is { Enforced: true, Value: < 500m })
             {
-                return false;
+                return null;
             }
 
             userDataAccess.AddUser(user);
-            return true;
+            return user;
         }
 
         public void Dispose() => _compositeDisposables.ForEach(disposable => disposable.Dispose());

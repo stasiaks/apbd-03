@@ -22,6 +22,29 @@ public class UserServiceLegacyTests
         Assert.True(result);
     }
 
+    [Fact]
+    public void GivenLegacyAppConsumerData_OnNewInvocation_ReturnsCorrectUser()
+    {
+        // Arrange
+        var sut = CreateSut();
+        var firstName = "John";
+        var lastName = "Doe";
+        var email = new Email("johndoe", new Domain("gmail", "com"));
+        var dateOfBirth = DateOnly.Parse("1982-03-21");
+        var clientId = 1;
+
+        // Act
+        var result = sut.AddUser(firstName, lastName, email, dateOfBirth, clientId);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(firstName, result.FirstName);
+        Assert.Equal(lastName, result.LastName);
+        Assert.Equal(email, result.EmailAddress);
+        Assert.Equal(clientId, result.Client.Id);
+        Assert.Equal(new CreditLimit(true, 3000), result.CreditLimit);
+    }
+
     [Theory]
     [InlineData("Kowalski", "kowalski@example.com", "1996-07-13", 2)]
     [AutoData]

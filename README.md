@@ -16,4 +16,4 @@ Oczywiście zachowałem w kodzie jej wymóg.
 
 Nie mam pojęcia co to miało znaczyć. Planowałem np. zmienić `CreditLimit` na nullable, i całkowicie to property usunąć, ale jest ono osobnym warunkiem, tylko dziwnie nazwanym.
 
-Zmieniłem nazwę na `IsExemptFromCreditLimitMinimum`, ponieważ tyle mogłem się domyślić z warunków.
+Zmieniłem nazwę na `CreditLimit.Enforced`, ponieważ tyle mogłem się domyślić z warunków.

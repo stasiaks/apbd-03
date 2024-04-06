@@ -8,6 +8,7 @@ public record User(
     Email EmailAddress,
     string FirstName,
     string LastName,
-    bool IsExemptFromCreditLimitMinimum,
-    int? CreditLimit
+    CreditLimit? CreditLimit
 );
+
+public record CreditLimit(bool Enforced, decimal Value);
